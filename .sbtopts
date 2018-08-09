@@ -1,3 +1,1 @@
--XX:+CMSClassUnloadingEnabled
--XX:MaxPermSize=2G
 -mem 2048
