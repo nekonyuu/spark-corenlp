@@ -15,7 +15,8 @@ All functions are defined under `com.databricks.spark.corenlp.functions`.
 * *`pos`*: Generates the part of speech tags of the sentence.
 * *`lemma`*: Generates the word lemmas of the sentence.
 * *`ner`*: Generates the named entity tags of the sentence.
-* *`depparse`*: Generates the semantic dependencies of the sentence and returns a flattened list of
+* *`parse`*: Generates the consistuency dependencies of the sentence
+* *`depparse`*: Generates the dependency graph of the sentence and returns a flattened list of
   `(source, sourceIndex, relation, target, targetIndex, weight)` relation tuples.
 * *`coref`*: Generates the coref chains in the document and returns a list of
   `(rep, mentions)` chain tuples, where `mentions` are in the format of
