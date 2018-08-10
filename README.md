@@ -66,3 +66,30 @@ Many thanks to Jason Bolton from the Stanford NLP Group for API discussions.
 ```bash
 sbt +publishLocal
 ```
+### Using on your own project
+
+In SBT :
+```
+resolvers += "GitHub nekonyuu artifacts - snapshots" at "https://artifacts.nyuu.eu/snapshots"
+libraryDependencies ++= Seq(
+  "nekonyuu" %% "spark-corenlp" % "0.3.0-SNAPSHOT"
+)
+```
+
+In maven :
+```
+<repositories>
+		<repository>
+		    <id>GitHub nekonyuu artifacts - snapshots</id>
+		    <url>https://artifacts.nyuu.eu/snapshots</url>
+		</repository>
+</repositories>
+```
+
+```
+<dependency>
+	    <groupId>nekonyuu</groupId>
+	    <artifactId>spark-corenlp</artifactId>
+	    <version>${sparkNlpVersion}-SNAPSHOT</version>
+</dependency>
+```
