@@ -63,6 +63,11 @@ class functionsSuite extends SparkFunSuite {
     testFunction(coref, document, expected)
   }
 
+  test("parse") {
+    val expected = "(ROOT (S (NP (NNP Stanford) (NNP University)) (VP (VBZ is) (VP (VBN located) (PP (IN in) (NP (NNP California))))) (. .)))"
+    testFunction(parse, sentence1, expected)
+  }
+
   test("depparse") {
     val expected = Seq(
       Row("University", 2, "compound", "Stanford", 1, 1.0),
@@ -86,4 +91,5 @@ class functionsSuite extends SparkFunSuite {
     testFunction(sentiment, sentence2, 4)
     testFunction(sentiment, document, 1) // only look at the first sentence
   }
+
 }

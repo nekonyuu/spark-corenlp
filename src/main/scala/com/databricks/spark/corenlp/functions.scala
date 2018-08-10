@@ -2,22 +2,22 @@ package com.databricks.spark.corenlp
 
 import java.util.Properties
 
-import scala.collection.JavaConverters._
-
 import edu.stanford.nlp.ling.{CoreAnnotations, CoreLabel}
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
-import edu.stanford.nlp.pipeline.{CleanXmlAnnotator, StanfordCoreNLP}
 import edu.stanford.nlp.pipeline.CoreNLPProtos.Sentiment
+import edu.stanford.nlp.pipeline.{CleanXmlAnnotator, StanfordCoreNLP}
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
 import edu.stanford.nlp.simple.{Document, Sentence}
 import edu.stanford.nlp.util.Quadruple
-
 import org.apache.spark.sql.functions.udf
 
+import scala.collection.JavaConverters._
+
 /**
- * A collection of Spark SQL UDFs that wrap CoreNLP annotators and simple functions.
- * @see [[edu.stanford.nlp.simple]]
- */
+  * A collection of Spark SQL UDFs that wrap CoreNLP annotators and simple functions.
+  *
+  * @see [[edu.stanford.nlp.simple]]
+  */
 object functions {
 
   @transient private var sentimentPipeline: StanfordCoreNLP = _
@@ -41,16 +41,16 @@ object functions {
   private case class CorefChain(representative: String, mentions: Seq[CorefMention])
 
   private case class SemanticGraphEdge(
-    source: String,
-    sourceIndex: Int,
-    relation: String,
-    target: String,
-    targetIndex: Int,
-    weight: Double)
+                                        source: String,
+                                        sourceIndex: Int,
+                                        relation: String,
+                                        target: String,
+                                        targetIndex: Int,
+                                        weight: Double)
 
   /**
-   * Cleans XML tags in a document.
-   */
+    * Cleans XML tags in a document.
+    */
   def cleanxml = udf { document: String =>
     val words = new Sentence(document).words().asScala
     val labels = words.map { w =>
@@ -63,31 +63,35 @@ object functions {
   }
 
   /**
-   * Tokenizes a sentence into words.
-   * @see [[Sentence#words]]
-   */
+    * Tokenizes a sentence into words.
+    *
+    * @see [[Sentence#words]]
+    */
   def tokenize = udf { sentence: String =>
     new Sentence(sentence).words().asScala
   }
 
   /**
-   * Tokenizes a sentence into words, with custom config.
-   * @see [[Sentence#words]]
-   */
+    * Tokenizes a sentence into words, with custom config.
+    *
+    * @see [[Sentence#words]]
+    */
   def tokenize(conf: CoreNLPConfig) = udf { sentence: String =>
     new Sentence(sentence, conf.props).words().asScala
   }
 
   /**
-   * Splits a document into sentences.
-   * @see [[Document#sentences]]
-   */
+    * Splits a document into sentences.
+    *
+    * @see [[Document#sentences]]
+    */
   def ssplit = udf { document: String =>
     new Document(document).sentences().asScala.map(_.text())
   }
 
   /**
     * Splits a document into sentences, using implicit CoreNLPConfig.
+    *
     * @see [[Document#sentences]]
     */
   def ssplit(conf: CoreNLPConfig) = udf { document: String =>
@@ -95,73 +99,90 @@ object functions {
   }
 
   /**
-   * Generates the part of speech tags of the sentence.
-   * @see [[Sentence#posTags]]
-   */
+    * Generates the part of speech tags of the sentence.
+    *
+    * @see [[Sentence#posTags]]
+    */
   def pos = udf { sentence: String =>
     new Sentence(sentence).posTags().asScala
   }
 
   /**
-   * Generates the part of speech tags of the sentence, using implicit CoreNLPConfig
-   * @see [[Sentence#posTags]]
-   */
+    * Generates the part of speech tags of the sentence, using implicit CoreNLPConfig
+    *
+    * @see [[Sentence#posTags]]
+    */
   def pos(conf: CoreNLPConfig) = udf { sentence: String =>
     new Sentence(sentence, conf.props).posTags(conf.props).asScala
   }
 
   /**
-   * Generates the word lemmas of the sentence.
-   * @see [[Sentence#lemmas]]
-   */
+    * Generates the word lemmas of the sentence.
+    *
+    * @see [[Sentence#lemmas]]
+    */
   def lemma = udf { sentence: String =>
     new Sentence(sentence).lemmas().asScala
   }
 
   /**
-   * Generates the word lemmas of the sentence, using implicit CoreNLP configuration.
-   * @see [[Sentence#lemmas]]
-   */
+    * Generates the word lemmas of the sentence, using implicit CoreNLP configuration.
+    *
+    * @see [[Sentence#lemmas]]
+    */
   def lemma(conf: CoreNLPConfig) = udf { sentence: String =>
     new Sentence(sentence, conf.props).lemmas(conf.props).asScala
   }
 
   /**
-   * Generates the named entity tags of the sentence.
-   * @see [[Sentence#nerTags]]
-   */
+    * Generates the named entity tags of the sentence.
+    *
+    * @see [[Sentence#nerTags]]
+    */
   def ner = udf { sentence: String =>
     new Sentence(sentence).nerTags().asScala
   }
 
   /**
-   * Generates the named entity tags of the sentence, using implicit CoreNLP configuration
-   * @see [[Sentence#nerTags]]
-   */
+    * Generates the named entity tags of the sentence, using implicit CoreNLP configuration
+    *
+    * @see [[Sentence#nerTags]]
+    */
   def ner(conf: CoreNLPConfig) = udf { sentence: String =>
     new Sentence(sentence, conf.props).nerTags(conf.props).asScala
   }
 
   /**
     * Generates the constituency parsing of the sentence.
+    *
     * @see [[Sentence#parse]]
     */
   def parse = udf { sentence: String =>
-    new Sentence(sentence).parse().asScala
+    new Sentence(sentence).parse()
+      .pennString()
+      .replaceAll("\n", " ")
+      .replaceAll("\\s{2,}", " ")
+      .trim
   }
 
   /**
     * Generates the constituency parsing of the sentence, using implicit CoreNLP configuration
+    *
     * @see [[Sentence#parse]]
     */
   def parse(conf: CoreNLPConfig) = udf { sentence: String =>
-    new Sentence(sentence, conf.props).parse(conf.props).asScala
+    new Sentence(sentence, conf.props).parse(conf.props)
+      .pennString()
+      .replaceAll("\n", " ")
+      .replaceAll("\\s{2,}", " ")
+      .trim
   }
 
   /**
-   * Generates the semantic dependencies of the sentence.
-   * @see [[Sentence#dependencyGraph]]
-   */
+    * Generates the semantic dependencies of the sentence.
+    *
+    * @see [[Sentence#dependencyGraph]]
+    */
   def depparse = udf { sentence: String =>
     new Sentence(sentence).dependencyGraph().edgeListSorted().asScala.map { edge =>
       SemanticGraphEdge(
@@ -175,9 +196,10 @@ object functions {
   }
 
   /**
-   * Generates the semantic dependencies of the sentence, configurable version.
-   * @see [[Sentence#dependencyGraph]]
-   */
+    * Generates the semantic dependencies of the sentence, configurable version.
+    *
+    * @see [[Sentence#dependencyGraph]]
+    */
   def depparse(conf: CoreNLPConfig) = udf { sentence: String =>
     new Sentence(sentence, conf.props).dependencyGraph(conf.props).edgeListSorted().asScala.map { edge =>
       SemanticGraphEdge(
@@ -191,8 +213,8 @@ object functions {
   }
 
   /**
-   * Generates the coref chains of the document.
-   */
+    * Generates the coref chains of the document.
+    */
   def coref = udf { document: String =>
     new Document(document).coref().asScala.values.map { chain =>
       val rep = chain.getRepresentativeMention.mentionSpan
@@ -204,29 +226,32 @@ object functions {
   }
 
   /**
-   * Generates the Natural Logic notion of polarity for each token in a sentence,
-   * returned as "up", "down", or "flat".
-   * @see [[Sentence#natlogPolarities]]
-   */
+    * Generates the Natural Logic notion of polarity for each token in a sentence,
+    * returned as "up", "down", or "flat".
+    *
+    * @see [[Sentence#natlogPolarities]]
+    */
   def natlog = udf { sentence: String =>
     new Sentence(sentence).natlogPolarities().asScala
-        .map(_.toString)
+      .map(_.toString)
   }
 
   /**
-   * Generates a list of Open IE triples as flat (subject, relation, target, confidence) quadruples.
-   * @see [[Sentence#openie]]
-   */
+    * Generates a list of Open IE triples as flat (subject, relation, target, confidence) quadruples.
+    *
+    * @see [[Sentence#openie]]
+    */
   def openie = udf { sentence: String =>
     new Sentence(sentence).openie().asScala.map(q => new OpenIE(q)).toSeq
   }
 
   /**
-   * Measures the sentiment of an input sentence on a scale of 0 (strong negative) to 4 (strong
-   * positive).
-   * If the input contains multiple sentences, only the first one is used.
-   * @see [[Sentiment]]
-   */
+    * Measures the sentiment of an input sentence on a scale of 0 (strong negative) to 4 (strong
+    * positive).
+    * If the input contains multiple sentences, only the first one is used.
+    *
+    * @see [[Sentiment]]
+    */
   def sentiment = udf { sentence: String =>
     val pipeline = getOrCreateSentimentPipeline()
     val annotation = pipeline.process(sentence)
