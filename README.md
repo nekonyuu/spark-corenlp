@@ -70,9 +70,9 @@ sbt +publishLocal
 
 In SBT :
 ```
-resolvers += "GitHub nekonyuu artifacts - snapshots" at "https://artifacts.nyuu.eu/snapshots"
+resolvers += "GitHub nekonyuu artifacts - releases" at "https://artifacts.nyuu.eu/releases/maven"
 libraryDependencies ++= Seq(
-  "nekonyuu" %% "spark-corenlp" % "0.3.0-SNAPSHOT"
+  "nekonyuu" %% "spark-corenlp" % "0.3.0"
 )
 ```
 
@@ -80,8 +80,8 @@ In maven :
 ```
 <repositories>
 		<repository>
-		    <id>GitHub nekonyuu artifacts - snapshots</id>
-		    <url>https://artifacts.nyuu.eu/snapshots</url>
+		    <id>GitHub nekonyuu artifacts - releases</id>
+		    <url>https://artifacts.nyuu.eu/releases/maven</url>
 		</repository>
 </repositories>
 ```
@@ -90,6 +90,6 @@ In maven :
 <dependency>
 	    <groupId>nekonyuu</groupId>
 	    <artifactId>spark-corenlp</artifactId>
-	    <version>${sparkNlpVersion}-SNAPSHOT</version>
+	    <version>${sparkNlpVersion}</version>
 </dependency>
 ```
